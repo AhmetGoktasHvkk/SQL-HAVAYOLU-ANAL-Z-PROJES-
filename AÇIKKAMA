@@ -1,0 +1,127 @@
+Havacılık sektöründe veri analizi, uçuş operasyonlarından müşteri deneyimine kadar birçok noktada karar destek sistemi sağlar.
+Aşağıdaki şema, 2000+ kayıt ile beslenebilecek şekilde tasarlanmış, veri analistlerinin kolayca sorgulama yapabileceği normalize edilmiş bir havayolu veritabanı örneğidir.
+
+1️⃣ flights – Uçuş Bilgileri
+Her satır, bir uçuşa ait:
+
+Kalkış ve varış havaalanı kodları (IATA formatı)
+
+Kalkış/varış zamanı
+
+Kullanılan uçak tipi
+
+Uçuş durumu (Planlandı, Tamamlandı, İptal, vb.)
+
+sql
+Kopyala
+Düzenle
+CREATE TABLE flights (
+    flight_id INT PRIMARY KEY,
+    departure_airport VARCHAR(10),
+    arrival_airport VARCHAR(10),
+    departure_time DATETIME,
+    arrival_time DATETIME,
+    aircraft_type VARCHAR(20),
+    status VARCHAR(20)
+);
+💡 Analiz örnekleri:
+
+En çok kullanılan uçak tipi
+
+Hangi hatlarda en fazla uçuş yapılıyor
+
+Ortalama uçuş süresi
+
+2️⃣ passengers – Yolcu Bilgileri
+Yolcu kimlik bilgileri ve demografik veriler:
+
+Cinsiyet, doğum tarihi
+
+Milliyet (uluslararası analiz için kritik)
+
+İleri seviye analizlerde müşteri segmentasyonu için temel veri
+
+sql
+Kopyala
+Düzenle
+CREATE TABLE passengers (
+    passenger_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    nationality VARCHAR(50),
+    gender CHAR(1),
+    birth_date DATE
+);
+💡 Analiz örnekleri:
+
+Milliyet bazında yolcu sayısı
+
+Yaş aralığına göre yolcu dağılımı
+
+Sadık müşteri tespiti
+
+3️⃣ tickets – Bilet Bilgileri
+Bilet sınıfı, fiyat ve satın alma tarihi gibi gelir analizinde kullanılan bilgiler:
+
+ticket_class (Economy, Business, First Class)
+
+ticket_price (fiyat analizi)
+
+purchase_date (satış zamanı analizi)
+
+sql
+Kopyala
+Düzenle
+CREATE TABLE tickets (
+    ticket_id INT PRIMARY KEY,
+    passenger_id INT,
+    flight_id INT,
+    ticket_class VARCHAR(20),
+    ticket_price DECIMAL(10, 2),
+    purchase_date DATE,
+    FOREIGN KEY (passenger_id) REFERENCES passengers(passenger_id),
+    FOREIGN KEY (flight_id) REFERENCES flights(flight_id)
+);
+💡 Analiz örnekleri:
+
+Bilet sınıfı bazında ortalama fiyat
+
+Satın alma zamanı ile fiyat ilişkisi
+
+Yolcu başına toplam harcama
+
+4️⃣ delays – Rötar Bilgileri
+Operasyonel performans ölçümü için kritik:
+
+Rötar nedeni (delay_reason)
+
+Rötar süresi (delay_minutes)
+
+sql
+Kopyala
+Düzenle
+CREATE TABLE delays (
+    delay_id INT PRIMARY KEY,
+    flight_id INT,
+    delay_reason VARCHAR(50),
+    delay_minutes INT,
+    FOREIGN KEY (flight_id) REFERENCES flights(flight_id)
+);
+💡 Analiz örnekleri:
+
+En sık görülen rötar nedenleri
+
+Hangi havaalanında en fazla rötar yaşanıyor
+
+Mevsimsel rötar analizi
+
+📊 İleri Seviye Analiz Olanakları
+Bu şema ile:
+
+JOIN kullanarak yolcu+uçuş+bilet+rötar analizleri yapılabilir.
+
+CTE ile geçici tablo analizleri
+
+Window Functions ile sıra numarası, geçmiş fiyat farkı analizi
+
+Pivot ile aylara/günlere göre gelir tablosu
+
